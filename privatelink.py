@@ -39,7 +39,7 @@ def lambder_handler(event, context):
         response['Status'] = 'FAILED'
         response['Reason'] = 'PrivateLink creation Failed - See \
                 CloudWatch logs for the Lamba function backing the custom resource for details'
-        send(event, context, FAILED, response['Reason'])
+        send(event, context, FAILED, response)
 
     else:
         send(event, context, SUCCESS, response)
