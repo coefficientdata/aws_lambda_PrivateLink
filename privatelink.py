@@ -8,12 +8,12 @@ Github:         https://github.com/adeelahmad84
 Description:    AWS Lambda to run aws-cli for PrivateLink
 """
 
-from __future__ import print_function
+import uuid
+import httplib
+import urlparse
+import json
 import boto3
-import os
-import sys
 
-ec2 = boto3.client('ec2')
 
 def send_response(request, response, status=None, reason=None):
     """ Send our response to the pre-signed URL supplied by CloudFormation
@@ -57,20 +57,29 @@ def handler(event, context):
         return send_response(event, response)
 
     try:
+
+        ec2 = boto3.client('ec2')
+
         privatelink = ec2.create_vpc_endpoint(
-                DryRun=event['ResourceProperties']['DryRun']
-                VpcEndpointType=event['ResourceProperties']['VpcEndpointType']
-                VpcId=event['ResourceProperties']['VpcId']
-                ServiceName=event['ResourceProperties']['ServiceName']
-                PolicyDocument=event['ResourceProperties']['PolicyDocument']
-                SubnetIds=event['ResourceProperties']['SubnetIds']
-                ClientToken=event['ResourceProperties']['ClientToken']
+                DryRun=event['ResourceProperties']['DryRun'],
+                VpcEndpointType=event['ResourceProperties']['VpcEndpointType'],
+                VpcId=event['ResourceProperties']['VpcId'],
+                ServiceName=event['ResourceProperties']['ServiceName'],
+                PolicyDocument=event['ResourceProperties']['PolicyDocument'],
+                SubnetIds=event['ResourceProperties']['SubnetIds'],
+                ClientToken=event['ResourceProperties']['ClientToken'],
                 PrivateDnsEnabled=event['ResourceProperties']['PrivateDnsEnabled']
                 )
 
         response['Data'] = {
-                
+                'PrivateLinkId': privatelink['VpcEndpoint']['VpcEndpointId']
                 }
+        response['Reason'] = 'The PrivateLink was successfully created'
 
+    except Exception as E:
+        response['Status'] = 'FAILED'
+        response['Reason'] = 'PrivateLink creation Failed - See CloudWatch logs for the Lamba function backing the custom resource for details'
+
+    return send_response(event, response)
 
 
