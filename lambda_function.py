@@ -10,8 +10,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 __version__ = "0.1"
 
-import time
-# import logging
 import unittest
 from botocore.exceptions import ClientError
 import boto3
@@ -62,19 +60,14 @@ def send(event, context, response_status, reason= \
         print("Failed executing HTTP request: {}".format(exc.code))
         return False
 
-
 def get_my_log_stream(context):
     """
     Logging function for the lambda handler to call.
     """
-    print("Log stream name:", context.log_stream_name)
-#     print("Log group name:", context.log_group_name)
-#     print("Request ID:",context.aws_request_id)
-#     print("Mem. limits(MB):", context.memory_limit_in_mb)
-    # Code will execute quickly, so we add a 1 second intentional\
-            # delay so you can see that in time remaining value.
-    time.sleep(1)
-#     print("Time remaining (MS):", context.get_remaining_time_in_millis())
+    print("Log stream name:", context.log_stream_name + '\n' + "Log group name:", \
+            context.log_group_name + '\n' +  "Request ID:", context.aws_request_id \
+            + '\n' +  "Mem. limits(MB):", context.memory_limit_in_mb + '\n' + \
+            "Time remaining (MS):", context.get_remaining_time_in_millis())
 
 def handler(event, context):
     """
@@ -93,24 +86,15 @@ def handler(event, context):
             VpcEndpointType=event['ResourceProperties']['VpcEndpointType'],
             VpcId=event['ResourceProperties']['VpcId'],
             ServiceName=event['ResourceProperties']['ServiceName'],
-            # PolicyDocument=event['ResourceProperties']['PolicyDocument'],
             SubnetIds=event['ResourceProperties']['SubnetIds']
         )
 
         send(event, context, SUCCESS, response)
-        # response['Data'] = privatelink
-        # response['Reason'] = 'The PrivateLink was successfully created'
 
     except ClientError as error:
-        # response['Data'] = privatelink
         print(error)
         print("Error: {0}".format(error))
         send(event, context, FAILED, response)
-
-    # logger = logging.getLogger()
-    # logger.setLevel(logging.DEBUG)
-    # logger.info('got event{}'.format(event))
-    # logger.error('something went wrong')
 
 if __name__ == "__main__":
     handler(event, context)
