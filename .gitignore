@@ -1,4 +1,5 @@
-event.json
+*.json
+
 ### OSX ###
 *.DS_Store
 .AppleDouble
