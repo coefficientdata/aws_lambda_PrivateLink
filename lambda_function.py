@@ -82,13 +82,15 @@ def handler(event, context):
 
     try:
         response = EC2.create_vpc_endpoint(
-            DryRun=event['ResourceProperties']['DryRun'],
+            DryRun=False,
             VpcEndpointType=event['ResourceProperties']['VpcEndpointType'],
             VpcId=event['ResourceProperties']['VpcId'],
             ServiceName=event['ResourceProperties']['ServiceName'],
-            SubnetIds=event['ResourceProperties']['SubnetIds']
+            SubnetIds=event['ResourceProperties']['SubnetIds'],
+            PrivateDnsEnabled=False
         )
 
+        response['VpcEndpoint'].pop('CreationTimestamp')
         send(event, context, SUCCESS, response)
 
     except ClientError as error:
