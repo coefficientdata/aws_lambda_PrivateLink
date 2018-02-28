@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -- coding: utf-8 --
+# -*- coding: utf-8 -*-
 
 """
 File:           privatelink.py
@@ -11,6 +11,7 @@ from cfnresponse import send, SUCCESS, FAILED
 import boto3
 
 EC2 = boto3.client('ec2')
+
 
 def lambder_handler(event, context):
     """
